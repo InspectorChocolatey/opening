@@ -5,22 +5,21 @@ import (
 	"os"
 	"os/exec"
 	"testing"
+
+	"github.com/notnil/chess"
 )
 
 func TestOpening(t *testing.T) {
-	if err := buildTree(nil); err != nil {
+	d := buildDirectory(nil)
+	g := chess.NewGame()
+	if err := g.MoveAlg("e4"); err != nil {
 		t.Fatal(err)
 	}
-	ch := make(chan *node)
-	go func() {
-		tree.nodes(tree.root, ch)
-		close(ch)
-	}()
-	count := 0
-	for range ch {
-		count++
+	if err := g.MoveAlg("d5"); err != nil {
+		t.Fatal(err)
 	}
-	log.Println(count)
+	o := d.Find(g)
+	log.Println(o.title)
 }
 
 func TestDrawOpening(t *testing.T) {
@@ -30,14 +29,12 @@ func TestDrawOpening(t *testing.T) {
 	fun := func(o *Opening) bool {
 		return o.code == "A00"
 	}
-	if err := buildTree(fun); err != nil {
-		t.Fatal(err)
-	}
+	d := buildDirectory(fun)
 	f, err := os.Create("test.dot")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := tree.draw(f); err != nil {
+	if err := d.draw(f); err != nil {
 		t.Fatal(err)
 	}
 	// dot -Tpng mygraph.dot -o mygraph.png

@@ -6,9 +6,19 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 
 	"github.com/notnil/chess"
 )
+
+var startingPosition *chess.Position
+
+func init() {
+	startingPosition = &chess.Position{}
+	if err := startingPosition.UnmarshalText([]byte("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")); err != nil {
+		panic(err)
+	}
+}
 
 type Opening struct {
 	code  string
@@ -70,15 +80,19 @@ func buildDirectory(f func(o *Opening) bool) *Directory {
 	}
 	return d
 }
+
 func (d *Directory) insert(o *Opening) error {
-	b := bytes.NewBufferString(o.pgn)
-	pgn, err := chess.PGN(b)
-	if err != nil {
-		return err
+	posList := []*chess.Position{startingPosition}
+	moves := []*chess.Move{}
+	for _, s := range parseMoveList(o.pgn) {
+		pos := posList[len(posList)-1]
+		m, err := chess.LongAlgebraicNotation{}.Decode(pos, s)
+		if err != nil {
+			panic(err)
+		}
+		moves = append(moves, m)
+		posList = append(posList, pos.Update(m))
 	}
-	g := chess.NewGame(pgn)
-	posList := g.Positions()
-	moves := g.Moves()
 	n := d.root
 	d.ins(n, o, posList[1:len(posList)], moves)
 	return nil
@@ -157,4 +171,19 @@ func label() string {
 	s := "a" + fmt.Sprint(labelCount)
 	labelCount++
 	return s
+}
+
+// 1.b2b4 e7e5 2.c1b2 f7f6 3.e2e4 f8b4 4.f1c4 b8c6 5.f2f4 d8e7 6.f4f5 g7g6
+func parseMoveList(pgn string) []string {
+	strs := strings.Split(pgn, " ")
+	cp := []string{}
+	for _, s := range strs {
+		i := strings.Index(s, ".")
+		if i == -1 {
+			cp = append(cp, s)
+		} else {
+			cp = append(cp, s[i+1:len(s)])
+		}
+	}
+	return cp
 }

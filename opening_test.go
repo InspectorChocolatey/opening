@@ -1,7 +1,6 @@
 package opening
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	"testing"
@@ -12,14 +11,16 @@ import (
 func TestOpening(t *testing.T) {
 	d := buildDirectory(nil)
 	g := chess.NewGame()
-	if err := g.MoveAlg("e4"); err != nil {
+	if err := g.MoveStr("e4"); err != nil {
 		t.Fatal(err)
 	}
-	if err := g.MoveAlg("d5"); err != nil {
+	if err := g.MoveStr("d5"); err != nil {
 		t.Fatal(err)
 	}
 	o := d.Find(g)
-	log.Println(o.title)
+	if o == nil {
+		t.Fatal("expected to find scandanavian opening")
+	}
 }
 
 func TestDrawOpening(t *testing.T) {

@@ -1,6 +1,4 @@
-package opening
-
-var csvData = []byte(`A00,Anderssen's Opening,1.a2a3
+A00,Anderssen's Opening,1.a2a3
 A00,"Polish Gambit, Anderssen's Opening",1.a2a3 a7a5 2.b2b4
 A00,Creepy Crawly Formation,1.a2a3 e7e5 2.h2h3 d7d5
 A00,Andersspike,1.a2a3 g7g6 2.g2g4
@@ -2573,4 +2571,4 @@ E97,"Korchnoi Attack, KID",1.d2d4 g8f6 2.c2c4 g7g6 3.b1c3 f8g7 4.e2e4 d7d6 5.g1f
 E98,E98,1.d2d4 g8f6 2.c2c4 g7g6 3.b1c3 f8g7 4.e2e4 d7d6 5.g1f3 e8g8 6.f1e2 e7e5 7.e1g1 b8c6 8.d4d5 c6e7 9.f3e1
 E98,"Kozul Gambit, KID",1.d2d4 g8f6 2.c2c4 g7g6 3.b1c3 f8g7 4.e2e4 d7d6 5.g1f3 e8g8 6.f1e2 e7e5 7.e1g1 b8c6 8.d4d5 c6e7 9.f3e1 f6d7 10.c1e3 f7f5
 E99,"Benko Attack, KID; E99",1.d2d4 g8f6 2.c2c4 g7g6 3.b1c3 f8g7 4.e2e4 d7d6 5.g1f3 e8g8 6.f1e2 e7e5 7.e1g1 b8c6 8.d4d5 c6e7 9.f3e1 f6d7 10.f2f3
-E99,"Benko Variation, KID",1.d2d4 g8f6 2.c2c4 g7g6 3.b1c3 f8g7 4.e2e4 d7d6 5.g1f3 e8g8 6.f1e2 e7e5 7.e1g1 b8c6 8.d4d5 c6e7 9.f3e1 f6d7 10.f2f3 f7f5 11.g2g4`)
+E99,"Benko Variation, KID",1.d2d4 g8f6 2.c2c4 g7g6 3.b1c3 f8g7 4.e2e4 d7d6 5.g1f3 e8g8 6.f1e2 e7e5 7.e1g1 b8c6 8.d4d5 c6e7 9.f3e1 f6d7 10.f2f3 f7f5 11.g2g4

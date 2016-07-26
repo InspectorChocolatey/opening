@@ -11,6 +11,60 @@ import (
 	"github.com/notnil/chess"
 )
 
+// A Opening represents a specific sequence of moves from the staring position.
+type Opening struct {
+	code  string
+	title string
+	pgn   string
+	game  *chess.Game
+}
+
+// Code returns the Encyclopaedia of Chess Openings (ECO) code.
+func (o *Opening) Code() string {
+	return o.code
+}
+
+// Title returns the Encyclopaedia of Chess Openings (ECO) title of the opening.
+func (o *Opening) Title() string {
+	return o.title
+}
+
+// PGN returns the opening in PGN format.
+func (o *Opening) PGN() string {
+	return o.pgn
+}
+
+// Game returns the opening as a game.
+func (o *Opening) Game() *chess.Game {
+	if o.game == nil {
+		pgn, _ := chess.PGN(bytes.NewBufferString(o.pgn))
+		o.game = chess.NewGame(pgn)
+	}
+	return o.game
+}
+
+// Find returns the most specific opening for the list of moves.  If no opening is found, Find returns nil.
+func Find(moves []*chess.Move) *Opening {
+	for n := dir.followPath(dir.root, moves); n != nil; n = n.parent {
+		if n.opening != nil {
+			return n.opening
+		}
+	}
+	return nil
+}
+
+// Possible returns the possible openings after the moves given.  If moves is empty or nil all openings are returned.
+func Possible(moves []*chess.Move) []*Opening {
+	n := dir.followPath(dir.root, moves)
+	openings := []*Opening{}
+	for _, n := range dir.nodeList(n) {
+		if n.opening != nil {
+			openings = append(openings, n.opening)
+		}
+	}
+	return openings
+}
+
 var startingPosition *chess.Position
 var dir *directory
 
@@ -22,33 +76,19 @@ func init() {
 	dir = buildDirectory(nil)
 }
 
-type Opening struct {
-	code  string
-	title string
-	pgn   string
-}
-
-func Find(g *chess.Game) *Opening {
-	return dir.findOpening(dir.root, g.Moves(), nil)
-}
-
 type directory struct {
 	root *node
 }
 
-func (d *directory) findOpening(n *node, moves []*chess.Move, o *Opening) *Opening {
-	if n.opening != nil {
-		o = n.opening
-	}
+func (d *directory) followPath(n *node, moves []*chess.Move) *node {
 	if len(moves) == 0 {
-		return o
+		return n
 	}
-	m := moves[0].String()
-	c, ok := n.children[m]
+	c, ok := n.children[moves[0].String()]
 	if !ok {
-		return o
+		return n
 	}
-	return d.findOpening(c, moves[1:len(moves)], o)
+	return d.followPath(c, moves[1:len(moves)])
 }
 
 func buildDirectory(f func(o *Opening) bool) *directory {
@@ -130,12 +170,7 @@ type node struct {
 
 func (d *directory) draw(w io.Writer) error {
 	s := "digraph g {\n"
-	ch := make(chan *node)
-	go func() {
-		d.nodes(d.root, ch)
-		close(ch)
-	}()
-	for n := range ch {
+	for _, n := range d.nodeList(d.root) {
 		title := ""
 		if n.opening != nil {
 			title = n.opening.title
@@ -155,6 +190,19 @@ func (d *directory) nodes(root *node, ch chan *node) {
 	for _, c := range root.children {
 		d.nodes(c, ch)
 	}
+}
+
+func (d *directory) nodeList(root *node) []*node {
+	ch := make(chan *node)
+	go func() {
+		dir.nodes(root, ch)
+		close(ch)
+	}()
+	nodes := []*node{}
+	for n := range ch {
+		nodes = append(nodes, n)
+	}
+	return nodes
 }
 
 var (

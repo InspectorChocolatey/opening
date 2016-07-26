@@ -8,7 +8,7 @@ import (
 	"github.com/notnil/chess"
 )
 
-func TestOpening(t *testing.T) {
+func TestFind(t *testing.T) {
 	g := chess.NewGame()
 	if err := g.MoveStr("e4"); err != nil {
 		t.Fatal(err)
@@ -16,9 +16,22 @@ func TestOpening(t *testing.T) {
 	if err := g.MoveStr("d5"); err != nil {
 		t.Fatal(err)
 	}
-	o := Find(g)
-	if o == nil {
-		t.Fatal("expected to find scandanavian opening")
+	o := Find(g.Moves())
+	expected := "Center Counter; Scandanavian; B01"
+	if o == nil || o.Title() != expected {
+		t.Fatalf("expected to find opening %s but got %s", expected, o.title)
+	}
+}
+
+func TestPossible(t *testing.T) {
+	g := chess.NewGame()
+	if err := g.MoveStr("g3"); err != nil {
+		t.Fatal(err)
+	}
+	openings := Possible(g.Moves())
+	actual := len(openings)
+	if actual != 4 {
+		t.Fatalf("expected %d possible openings but got %d", 4, actual)
 	}
 }
 
@@ -40,5 +53,11 @@ func TestDrawOpening(t *testing.T) {
 	// dot -Tpng mygraph.dot -o mygraph.png
 	if err := exec.Command("dot", "-Tpng", "test.dot", "-o", "test.png").Run(); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func BenchmarkInit(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		buildDirectory(nil)
 	}
 }

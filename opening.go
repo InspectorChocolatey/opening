@@ -12,12 +12,14 @@ import (
 )
 
 var startingPosition *chess.Position
+var dir *directory
 
 func init() {
 	startingPosition = &chess.Position{}
 	if err := startingPosition.UnmarshalText([]byte("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")); err != nil {
 		panic(err)
 	}
+	dir = buildDirectory(nil)
 }
 
 type Opening struct {
@@ -26,38 +28,31 @@ type Opening struct {
 	pgn   string
 }
 
-type Directory struct {
+func Find(g *chess.Game) *Opening {
+	return dir.findOpening(dir.root, g.Moves(), nil)
+}
+
+type directory struct {
 	root *node
 }
 
-func NewDirectory() *Directory {
-	return buildDirectory(nil)
-}
-
-func (d *Directory) Find(g *chess.Game) *Opening {
-	var o *Opening
-	d.findOpening(d.root, g.Moves(), o)
-	return o
-}
-
-func (d *Directory) findOpening(n *node, moves []*chess.Move, o *Opening) {
-	if len(moves) == 0 {
-		return
-	}
+func (d *directory) findOpening(n *node, moves []*chess.Move, o *Opening) *Opening {
 	if n.opening != nil {
 		o = n.opening
-		log.Println(n.opening.title)
+	}
+	if len(moves) == 0 {
+		return o
 	}
 	m := moves[0].String()
 	c, ok := n.children[m]
 	if !ok {
-		return
+		return o
 	}
-	d.findOpening(c, moves[1:len(moves)], o)
+	return d.findOpening(c, moves[1:len(moves)], o)
 }
 
-func buildDirectory(f func(o *Opening) bool) *Directory {
-	d := &Directory{
+func buildDirectory(f func(o *Opening) bool) *directory {
+	d := &directory{
 		root: &node{
 			children: map[string]*node{},
 			pos:      chess.NewGame().Position(),
@@ -81,7 +76,7 @@ func buildDirectory(f func(o *Opening) bool) *Directory {
 	return d
 }
 
-func (d *Directory) insert(o *Opening) error {
+func (d *directory) insert(o *Opening) error {
 	posList := []*chess.Position{startingPosition}
 	moves := []*chess.Move{}
 	for _, s := range parseMoveList(o.pgn) {
@@ -98,7 +93,7 @@ func (d *Directory) insert(o *Opening) error {
 	return nil
 }
 
-func (d *Directory) ins(n *node, o *Opening, posList []*chess.Position, moves []*chess.Move) {
+func (d *directory) ins(n *node, o *Opening, posList []*chess.Position, moves []*chess.Move) {
 	pos := posList[0]
 	move := moves[0]
 	moveStr := move.String()
@@ -133,7 +128,7 @@ type node struct {
 	label    string
 }
 
-func (d *Directory) draw(w io.Writer) error {
+func (d *directory) draw(w io.Writer) error {
 	s := "digraph g {\n"
 	ch := make(chan *node)
 	go func() {
@@ -155,7 +150,7 @@ func (d *Directory) draw(w io.Writer) error {
 	return err
 }
 
-func (d *Directory) nodes(root *node, ch chan *node) {
+func (d *directory) nodes(root *node, ch chan *node) {
 	ch <- root
 	for _, c := range root.children {
 		d.nodes(c, ch)

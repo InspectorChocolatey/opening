@@ -1,6 +1,7 @@
 package opening
 
-var csvData = []byte(`A00,Anderssen's Opening,1.a2a3
+var csvData = []byte(`Code,Name,PGN
+A00,Anderssen's Opening,1.a2a3
 A00,"Polish Gambit, Anderssen's Opening",1.a2a3 a7a5 2.b2b4
 A00,Creepy Crawly Formation,1.a2a3 e7e5 2.h2h3 d7d5
 A00,Andersspike,1.a2a3 g7g6 2.g2g4

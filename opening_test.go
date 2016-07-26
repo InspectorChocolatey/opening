@@ -9,7 +9,6 @@ import (
 )
 
 func TestOpening(t *testing.T) {
-	d := buildDirectory(nil)
 	g := chess.NewGame()
 	if err := g.MoveStr("e4"); err != nil {
 		t.Fatal(err)
@@ -17,7 +16,7 @@ func TestOpening(t *testing.T) {
 	if err := g.MoveStr("d5"); err != nil {
 		t.Fatal(err)
 	}
-	o := d.Find(g)
+	o := Find(g)
 	if o == nil {
 		t.Fatal("expected to find scandanavian opening")
 	}

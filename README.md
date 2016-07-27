@@ -9,7 +9,7 @@ The [Encyclopaedia of Chess Openings](https://en.wikipedia.org/wiki/Encyclopaedi
 
 ## Visual
 
-Here is an example of the French Defense subtree:
+Advance Variation subtree of the French Defense:
 
 ![subtree](https://github.com/notnil/opening/raw/master/test.png)
 

@@ -12,7 +12,7 @@ func TestDrawOpening(t *testing.T) {
 		t.Skip()
 	}
 	fun := func(o *Opening) bool {
-		return o.code == "C00"
+		return o.code == "C02"
 	}
 	d := buildDirectory(fun)
 	f, err := os.Create("test.dot")

@@ -1,3 +1,4 @@
+// Package opening implements chess opening determination and exploration.
 package opening
 
 import (

@@ -4,8 +4,6 @@ import (
 	"os"
 	"os/exec"
 	"testing"
-
-	"github.com/notnil/opening"
 )
 
 // this test is used to visualize the graph of openings using a dot file
@@ -13,8 +11,8 @@ func TestDrawOpening(t *testing.T) {
 	if testing.Short() {
 		t.Skip()
 	}
-	fun := func(o *opening.Opening) bool {
-		return o.code == "A00"
+	fun := func(o *Opening) bool {
+		return o.code == "C00"
 	}
 	d := buildDirectory(fun)
 	f, err := os.Create("test.dot")
